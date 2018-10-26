@@ -12,30 +12,40 @@ const server = Hapi.server({
 server.route({
     method:'GET',
     path:'/hello',
-    handler:function(req, res) {
+    handler: (request, reply) => {
         return 'hello world'
     }
 })
 
 server.route({
   method: 'GET',
+  path: '/user/{name?}',
+  handler: (request, reply) => {
+    if (request.params.name) {
+      return `Hello ${request.params.name}`
+    }
+    return 'Hello user without name!'
+  }
+})
+
+server.route({
+  method: 'GET',
   path: '/oi',
-  handler: function(req, res) {
+  handler: (request, reply) => {
     return 'Olá!'
   }
 })
 // Start the server
-async function start() {
+const init = async () => {
 
-    try {
-        await server.start()
-    }
-    catch (err) {
-        console.log(err);
-        process.exit(1);
-    }
+    await server.start();
+    console.log(`Server running at: ${server.info.uri}`);
+};
 
-    console.log('Server running at:', server.info.uri)
-}
+process.on('unhandledRejection', (err) => {
 
-start()
+    console.log(err);
+    process.exit(1);
+});
+
+init();
